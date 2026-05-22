@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Style Gallery</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="product-detail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>EH <span>Brand</span></h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="home-link">Home</a></li>
+                <li><a href="index.html#products" class="products-link">Products</a></li>
+                <li><a href="index.html#about" class="about-link">About</a></li>
+                <li><a href="index.html#contact" class="contact-link">Contact</a></li>
+                <li><a href="https://www.facebook.com/share/1QwjLiXrzA/" class="admin-link" target="_blank">Admin</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Detail Content -->
+    <main class="detail-main">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="index.html#products">Products</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="breadcrumbName">Loading...</span>
+            </nav>
+
+            <!-- Loading State -->
+            <div class="detail-loader" id="detailLoader">
+                <div class="spinner"></div>
+                <p>Loading product...</p>
+            </div>
+
+            <!-- Product Detail Card -->
+            <div class="detail-wrapper" id="detailWrapper" style="display:none;">
+
+                <!-- Left: Image Gallery -->
+                <div class="detail-gallery">
+                    <div class="main-image-wrap">
+                        <img id="mainImage" src="" alt="Product Image">
+                        <div class="img-zoom-hint"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                    <div class="thumbnail-strip" id="thumbnailStrip">
+                        <!-- thumbnails injected here -->
+                    </div>
+                </div>
+
+                <!-- Right: Info -->
+                <div class="detail-info">
+                    <h1 class="detail-name" id="detailName"></h1>
+
+                    <div class="detail-price-row" id="detailPriceRow"></div>
+
+                    <div class="detail-code-row">
+                        <span>Product Code:</span>
+                        <span class="code-badge" id="detailCode"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="detail-description" id="detailDescription" style="display:none;">
+                        <h3><i class="fas fa-align-left"></i> বিবরণ / Description</h3>
+                        <div class="desc-text" id="descText"></div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="detail-actions">
+                        <button class="btn-primary order-btn-detail" id="orderBtnDetail">
+                            <i class="fas fa-shopping-cart"></i> Order Now
+                        </button>
+                        <button class="btn-share-detail" id="shareBtnDetail">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    </div>
+
+                    <!-- Share copied toast -->
+                    <div class="share-copied" id="shareCopied" style="display:none;">
+                        <i class="fas fa-check-circle"></i> লিংক কপি হয়েছে!
+                    </div>
+
+                    <!-- Back Button -->
+                    <a href="index.html#products" class="back-link">
+                        <i class="fas fa-arrow-left"></i> সব প্রোডাক্ট দেখুন
+                    </a>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div class="detail-error" id="detailError" style="display:none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>প্রোডাক্ট পাওয়া যায়নি</h3>
+                <p>এই প্রোডাক্টটি বর্তমানে উপলব্ধ নেই।</p>
+                <a href="index.html#products" class="btn-primary" style="display:inline-flex;margin-top:1rem;">
+                    <i class="fas fa-arrow-left"></i>&nbsp; সব প্রোডাক্ট দেখুন
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Order Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">Place Your Order</h2>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="phoneNumber" required>
+                    <small>Format: 01XXXXXXXXX</small>
+                </div>
+                <div class="form-group">
+                    <label>Delivery Location *</label>
+                    <input type="text" id="location" required>
+                </div>
+                <div class="form-group">
+                    <label>Size</label>
+                    <input type="text" id="sizeInput" placeholder="যেমন: M, L, XL">
+                </div>
+                <div class="form-group">
+                    <label>পরিমাণ (Quantity) *</label>
+                    <div class="quantity-wrapper">
+                        <button type="button" class="qty-btn" id="qtyMinus"><i class="fas fa-minus"></i></button>
+                        <input type="number" id="quantityInput" value="1" min="1" max="100" required>
+                        <button type="button" class="qty-btn" id="qtyPlus"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryCharge">ডেলিভারি চার্জ (TK) *</label>
+                    <div class="delivery-options">
+                        <label class="delivery-radio">
+                            <input type="radio" name="deliveryType" value="60" id="dInside"> 
+                            <span><i class="fas fa-city"></i> ঢাকার ভেতরে — <strong>TK 60</strong></span>
+                        </label>
+                        <label class="delivery-radio">
+                            <input type="radio" name="deliveryType" value="120" id="dOutside">
+                            <span><i class="fas fa-map-marked-alt"></i> ঢাকার বাইরে — <strong>TK 120</strong></span>
+                        </label>
+                        <label class="delivery-radio">
+                            <input type="radio" name="deliveryType" value="custom" id="dCustom">
+                            <span><i class="fas fa-pen"></i> কাস্টম</span>
+                        </label>
+                    </div>
+                    <input type="number" id="deliveryCharge" placeholder="ডেলিভারি চার্জ লিখুন..." min="0" style="display:none; margin-top:0.6rem;">
+                </div>
+                <div class="form-group">
+                    <div class="total-price-box" id="totalPriceBox" style="display:none;">
+                        <div class="total-breakdown">
+                            <div class="breakdown-row">
+                                <span>পণ্যের মূল্য</span>
+                                <span id="subtotalDisplay">TK 0.00</span>
+                            </div>
+                            <div class="breakdown-row">
+                                <span>ডেলিভারি চার্জ</span>
+                                <span id="deliveryDisplay">TK 0.00</span>
+                            </div>
+                            <div class="breakdown-row total-row">
+                                <span><i class="fas fa-tag"></i> সর্বমোট</span>
+                                <span class="total-amount" id="totalPriceDisplay">TK 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Product Code *</label>
+                    <input type="text" id="productCode" readonly required>
+                </div>
+                <div class="form-group">
+                    <label>মন্তব্য (Comment)</label>
+                    <textarea id="customerComment" rows="3" placeholder="আপনার বিশেষ কোনো চাহিদা বা মন্তব্য লিখুন..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast" id="successToast" style="display:none;">
+        <div class="toast-content">
+            <i class="fas fa-check-circle"></i>
+            <span>Order placed successfully!</span>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" style="display:none;">
+        <button class="lb-close" id="lbClose"><i class="fas fa-times"></i></button>
+        <button class="lb-prev" id="lbPrev"><i class="fas fa-chevron-left"></i></button>
+        <div class="lb-image-wrap">
+            <img id="lbImage" src="" alt="">
+        </div>
+        <button class="lb-next" id="lbNext"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script src="product-detail.js"></script>
+</body>
+</html>
