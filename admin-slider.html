@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slider ম্যানেজমেন্ট — Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* ── Top Bar ── */
+        .topbar {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 14px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 10px; }
+        .topbar-logo {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1rem;
+        }
+        .topbar-title { font-size: 1rem; font-weight: 700; color: #fff; }
+        .topbar-sub { font-size: 0.72rem; color: #94a3b8; margin-top: 1px; }
+        .topbar-right { display: flex; align-items: center; gap: 8px; }
+        .btn-back-home {
+            background: rgba(255,255,255,0.1);
+            color: #cbd5e1; border: 1px solid rgba(255,255,255,0.15);
+            padding: 7px 14px; border-radius: 8px; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-back-home:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+        /* ── Login Gate ── */
+        #loginGate {
+            display: flex; align-items: center; justify-content: center;
+            min-height: calc(100vh - 64px);
+        }
+        .login-card {
+            background: #fff; border-radius: 18px;
+            padding: 32px 28px; width: 90%; max-width: 360px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-icon {
+            width: 60px; height: 60px; border-radius: 16px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.6rem; margin: 0 auto 16px;
+        }
+        .login-card h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+        .login-card p { font-size: 0.82rem; color: #64748b; margin-bottom: 20px; }
+        .login-field {
+            width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0;
+            border-radius: 10px; font-size: 0.9rem; outline: none;
+            margin-bottom: 12px; transition: border 0.2s;
+        }
+        .login-field:focus { border-color: #6366f1; }
+        .btn-login {
+            width: 100%; padding: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 0.92rem; font-weight: 700; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-login:hover { opacity: 0.9; }
+        .login-error {
+            color: #ef4444; font-size: 0.78rem; margin-top: 8px;
+            display: none;
+        }
+
+        /* ── Main Panel ── */
+        #adminPanel { display: none; padding: 20px 16px; max-width: 700px; margin: 0 auto; }
+
+        /* ── Section Title ── */
+        .section-heading {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .section-heading h3 { font-size: 1rem; font-weight: 800; color: #1e293b; }
+        .section-heading span { font-size: 0.75rem; color: #94a3b8; }
+
+        /* ── Add Slider Card ── */
+        .add-card {
+            background: #fff; border-radius: 16px;
+            padding: 20px; margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 2px dashed #c7d2fe;
+        }
+        .add-card h4 {
+            font-size: 0.88rem; font-weight: 700; color: #6366f1;
+            margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+        }
+        .field-label {
+            font-size: 0.78rem; font-weight: 600; color: #475569;
+            margin-bottom: 5px; display: block;
+        }
+        .field-input {
+            width: 100%; padding: 10px 13px; border: 1.5px solid #e2e8f0;
+            border-radius: 10px; font-size: 0.85rem; outline: none;
+            margin-bottom: 12px; transition: border 0.2s; color: #1e293b;
+        }
+        .field-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+        .field-row { display: flex; gap: 10px; }
+        .field-row > div { flex: 1; }
+
+        /* Image Preview */
+        .img-preview-wrap {
+            border: 1.5px dashed #cbd5e1; border-radius: 10px;
+            overflow: hidden; margin-bottom: 12px; background: #f8fafc;
+            min-height: 100px; display: flex; align-items: center; justify-content: center;
+        }
+        .img-preview-wrap img {
+            width: 100%; max-height: 180px; object-fit: cover; display: none;
+        }
+        .img-placeholder {
+            text-align: center; padding: 20px; color: #94a3b8;
+        }
+        .img-placeholder i { font-size: 1.8rem; margin-bottom: 6px; display: block; }
+        .img-placeholder p { font-size: 0.78rem; }
+
+        .btn-add {
+            width: 100%; padding: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 0.9rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            transition: all 0.2s; box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+        }
+        .btn-add:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-add:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* ── Slider List ── */
+        .slider-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .slider-item {
+            background: #fff; border-radius: 14px;
+            overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1.5px solid #e2e8f0;
+            transition: box-shadow 0.2s;
+        }
+        .slider-item:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.1); }
+
+        .slider-item-img {
+            width: 100%; height: 140px; object-fit: cover; display: block;
+        }
+        .slider-item-body { padding: 12px 14px; }
+        .slider-item-title {
+            font-size: 0.9rem; font-weight: 700; color: #1e293b;
+            margin-bottom: 3px;
+        }
+        .slider-item-sub { font-size: 0.75rem; color: #64748b; margin-bottom: 10px; }
+        .slider-item-url {
+            font-size: 0.7rem; color: #94a3b8; word-break: break-all;
+            background: #f8fafc; padding: 5px 8px; border-radius: 6px;
+            margin-bottom: 10px; display: block;
+        }
+
+        .slider-item-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-order {
+            background: #f1f5f9; border: none; border-radius: 7px;
+            width: 32px; height: 32px; cursor: pointer; color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; transition: all 0.18s;
+        }
+        .btn-order:hover { background: #e2e8f0; color: #1e293b; }
+        .order-badge {
+            font-size: 0.72rem; color: #94a3b8; margin-right: auto;
+        }
+        .btn-delete {
+            background: #fef2f2; border: none; border-radius: 7px;
+            padding: 6px 12px; cursor: pointer; color: #ef4444;
+            font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; gap: 4px;
+            transition: all 0.18s;
+        }
+        .btn-delete:hover { background: #fee2e2; }
+
+        /* ── Status / Toast ── */
+        .status-toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #fff; padding: 10px 20px;
+            border-radius: 10px; font-size: 0.82rem; font-weight: 600;
+            display: none; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+        .status-toast.show { display: block; animation: fadeInUp 0.3s ease; }
+        .status-toast.success { background: #10b981; }
+        .status-toast.error { background: #ef4444; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center; padding: 30px 20px; color: #94a3b8;
+        }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+        .empty-state p { font-size: 0.85rem; }
+
+        /* ── Loader ── */
+        .list-loader {
+            text-align: center; padding: 20px; color: #94a3b8; font-size: 0.85rem;
+        }
+
+        /* ── Info box ── */
+        .info-box {
+            background: #eff6ff; border: 1.5px solid #bfdbfe;
+            border-radius: 10px; padding: 12px 14px;
+            font-size: 0.78rem; color: #1d4ed8; margin-bottom: 20px;
+            display: flex; gap: 8px; align-items: flex-start;
+        }
+        .info-box i { margin-top: 2px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+    <div class="topbar-left">
+        <div class="topbar-logo"><i class="fas fa-images"></i></div>
+        <div>
+            <div class="topbar-title">Slider ম্যানেজমেন্ট</div>
+            <div class="topbar-sub">ওয়েবসাইটের ব্যানার পরিবর্তন করুন</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="index.html" class="btn-back-home"><i class="fas fa-home"></i> ওয়েবসাইট</a>
+    </div>
+</div>
+
+<!-- Login Gate -->
+<div id="loginGate">
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-lock"></i></div>
+        <h2>Admin লগইন</h2>
+        <p>Slider ম্যানেজমেন্ট করতে পাসওয়ার্ড দিন</p>
+        <input type="password" id="adminPass" class="login-field" placeholder="পাসওয়ার্ড লিখুন" />
+        <button class="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> প্রবেশ করুন</button>
+        <div class="login-error" id="loginError">পাসওয়ার্ড ভুল হয়েছে!</div>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="adminPanel">
+
+    <div class="info-box">
+        <i class="fas fa-info-circle"></i>
+        <span>এখানে ইমেজ URL দিয়ে slider যোগ করুন। ওয়েবসাইট রিফ্রেশ করলেই নতুন slider দেখাবে। ImgBB বা যেকোনো image host থেকে direct link ব্যবহার করুন।</span>
+    </div>
+
+    <!-- Add New Slider -->
+    <div class="add-card">
+        <h4><i class="fas fa-plus-circle"></i> নতুন Slider যোগ করুন</h4>
+
+        <label class="field-label">ইমেজ URL *</label>
+        <input type="url" id="newImgUrl" class="field-input" placeholder="https://i.ibb.co/..." oninput="previewImg(this.value)" />
+
+        <div class="img-preview-wrap" id="imgPreviewWrap">
+            <img id="imgPreview" src="" alt="preview" />
+            <div class="img-placeholder" id="imgPlaceholder">
+                <i class="fas fa-image"></i>
+                <p>URL দিলে এখানে preview দেখাবে</p>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div>
+                <label class="field-label">শিরোনাম (ঐচ্ছিক)</label>
+                <input type="text" id="newTitle" class="field-input" placeholder="যেমনঃ বিশেষ অফার" />
+            </div>
+            <div>
+                <label class="field-label">ক্রম নম্বর</label>
+                <input type="number" id="newOrder" class="field-input" placeholder="1" min="1" value="1" />
+            </div>
+        </div>
+
+        <label class="field-label">লিংক (ঐচ্ছিক — ক্লিক করলে কোথায় যাবে)</label>
+        <input type="url" id="newLink" class="field-input" placeholder="https://..." />
+
+        <button class="btn-add" id="btnAdd" onclick="addSlider()">
+            <i class="fas fa-plus"></i> Slider যোগ করুন
+        </button>
+    </div>
+
+    <!-- Existing Sliders -->
+    <div class="section-heading">
+        <h3><i class="fas fa-list" style="color:#6366f1;margin-right:6px"></i> বর্তমান Slider সমূহ</h3>
+        <span id="sliderCount">লোড হচ্ছে...</span>
+    </div>
+
+    <div class="slider-list" id="sliderList">
+        <div class="list-loader"><i class="fas fa-spinner fa-spin"></i> লোড হচ্ছে...</div>
+    </div>
+</div>
+
+<!-- Status Toast -->
+<div class="status-toast" id="statusToast"></div>
+
+<!-- Firebase -->
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, orderBy, query, serverTimestamp }
+        from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC2Bsd-HqfhhC8i5cQUF2ZmofUJaFIcvDs",
+        authDomain: "lamim-754aa.firebaseapp.com",
+        projectId: "lamim-754aa",
+        storageBucket: "lamim-754aa.firebasestorage.app",
+        messagingSenderId: "1087897423283",
+        appId: "1:1087897423283:web:10a57c0acf8879fc1e4fc6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window._sliderDb = db;
+    window._sliderCol = () => collection(db, 'sliders');
+    window._sliderFns = { getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp };
+
+    // Load sliders on start
+    window.loadSliders();
+</script>
+
+<script>
+    // ── Auth ──
+    const ADMIN_PASS = 'admin1234'; // এখানে আপনার পাসওয়ার্ড পরিবর্তন করুন
+
+    function doLogin() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === ADMIN_PASS) {
+            document.getElementById('loginGate').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+            document.getElementById('adminPass').style.border = '2px solid #ef4444';
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.getElementById('loginGate').style.display !== 'none') {
+            doLogin();
+        }
+    });
+
+    // ── Image Preview ──
+    window.previewImg = function(url) {
+        const img = document.getElementById('imgPreview');
+        const ph = document.getElementById('imgPlaceholder');
+        if (url && url.startsWith('http')) {
+            img.src = url;
+            img.style.display = 'block';
+            ph.style.display = 'none';
+            img.onerror = () => { img.style.display = 'none'; ph.style.display = 'block'; };
+        } else {
+            img.style.display = 'none';
+            ph.style.display = 'block';
+        }
+    };
+
+    // ── Load Sliders ──
+    window.loadSliders = async function() {
+        if (!window._sliderDb) { setTimeout(loadSliders, 300); return; }
+        const { getDocs, query, orderBy } = window._sliderFns;
+        const list = document.getElementById('sliderList');
+        try {
+            const q = query(window._sliderCol(), orderBy('order', 'asc'));
+            const snap = await getDocs(q);
+            const sliders = [];
+            snap.forEach(d => sliders.push({ id: d.id, ...d.data() }));
+            document.getElementById('sliderCount').textContent = `${sliders.length}টি slider`;
+            renderList(sliders);
+        } catch(e) {
+            // If no order field yet, load without sort
+            try {
+                const snap = await getDocs(window._sliderCol());
+                const sliders = [];
+                snap.forEach(d => sliders.push({ id: d.id, ...d.data() }));
+                document.getElementById('sliderCount').textContent = `${sliders.length}টি slider`;
+                renderList(sliders);
+            } catch(e2) {
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>লোড করতে সমস্যা হয়েছে।</p></div>`;
+            }
+        }
+    };
+
+    function renderList(sliders) {
+        const list = document.getElementById('sliderList');
+        if (!sliders.length) {
+            list.innerHTML = `<div class="empty-state"><i class="fas fa-images"></i><p>এখনো কোনো slider নেই। উপরে যোগ করুন।</p></div>`;
+            return;
+        }
+        list.innerHTML = sliders.map((s, idx) => `
+            <div class="slider-item" id="si-${s.id}">
+                <img class="slider-item-img" src="${s.imageUrl}" alt="${s.title || 'Slider'}"
+                     onerror="this.style.background='#f1f5f9';this.style.height='60px'">
+                <div class="slider-item-body">
+                    <div class="slider-item-title">${s.title || '(শিরোনাম নেই)'}</div>
+                    <span class="slider-item-url">${s.imageUrl}</span>
+                    <div class="slider-item-actions">
+                        <span class="order-badge"><i class="fas fa-sort-numeric-up"></i> ক্রম: ${s.order || idx+1}</span>
+                        <button class="btn-order" onclick="moveSlider('${s.id}', ${s.order||idx+1}, -1)" title="উপরে">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button class="btn-order" onclick="moveSlider('${s.id}', ${s.order||idx+1}, 1)" title="নিচে">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <button class="btn-delete" onclick="deleteSlider('${s.id}')">
+                            <i class="fas fa-trash"></i> মুছুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ── Add Slider ──
+    window.addSlider = async function() {
+        const url = document.getElementById('newImgUrl').value.trim();
+        const title = document.getElementById('newTitle').value.trim();
+        const order = parseInt(document.getElementById('newOrder').value) || 1;
+        const link = document.getElementById('newLink').value.trim();
+
+        if (!url) { showToast('ইমেজ URL দিন!', 'error'); return; }
+        if (!url.startsWith('http')) { showToast('সঠিক URL দিন (http দিয়ে শুরু)', 'error'); return; }
+
+        const btn = document.getElementById('btnAdd');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> যোগ হচ্ছে...';
+        btn.disabled = true;
+
+        try {
+            const { addDoc, serverTimestamp } = window._sliderFns;
+            await addDoc(window._sliderCol(), {
+                imageUrl: url,
+                title: title || '',
+                order: order,
+                link: link || '',
+                createdAt: serverTimestamp()
+            });
+            showToast('✅ Slider সফলভাবে যোগ হয়েছে!', 'success');
+            document.getElementById('newImgUrl').value = '';
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newLink').value = '';
+            document.getElementById('newOrder').value = '1';
+            previewImg('');
+            loadSliders();
+        } catch(e) {
+            showToast('❌ যোগ করতে সমস্যা হয়েছে।', 'error');
+        }
+        btn.innerHTML = '<i class="fas fa-plus"></i> Slider যোগ করুন';
+        btn.disabled = false;
+    };
+
+    // ── Delete Slider ──
+    window.deleteSlider = async function(id) {
+        if (!confirm('এই slider মুছতে চান?')) return;
+        try {
+            const { deleteDoc, doc } = window._sliderFns;
+            await deleteDoc(doc(window._sliderDb, 'sliders', id));
+            document.getElementById(`si-${id}`)?.remove();
+            showToast('🗑️ Slider মুছে ফেলা হয়েছে।', 'success');
+            loadSliders();
+        } catch(e) {
+            showToast('❌ মুছতে সমস্যা হয়েছে।', 'error');
+        }
+    };
+
+    // ── Reorder ──
+    window.moveSlider = async function(id, currentOrder, direction) {
+        try {
+            const { updateDoc, doc } = window._sliderFns;
+            await updateDoc(doc(window._sliderDb, 'sliders', id), {
+                order: currentOrder + direction
+            });
+            loadSliders();
+        } catch(e) {
+            showToast('❌ ক্রম পরিবর্তন করা যায়নি।', 'error');
+        }
+    };
+
+    // ── Toast ──
+    function showToast(msg, type = '') {
+        const t = document.getElementById('statusToast');
+        t.textContent = msg;
+        t.className = `status-toast show ${type}`;
+        setTimeout(() => { t.className = 'status-toast'; }, 3000);
+    }
+</script>
+
+</body>
+</html>
